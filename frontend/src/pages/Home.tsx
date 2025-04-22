@@ -5,10 +5,11 @@ import RepoUploader from "../components/RepoUploader";
 
 const Home = () => {
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <h1 className="text-3xl font-bold">🤖 Cody – Your Code Buddy</h1>
-            <RepoUploader />
-            <ModelSwitcher />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+            <div>
+                <RepoUploader />
+                <ModelSwitcher />
+            </div>
             <ChatBox />
         </div>
     );
