@@ -22,9 +22,29 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/chat', (req, res) => {
-  const { message } = req.body;
-  console.log("Received from frontend:", message);
-  res.json({ reply: `Echo: ${message}` });
+  const { message, repoId } = req.body; // Now includes repoId
+
+  // If repoId is provided, find the corresponding folder
+  let repoInfo = {};
+  if (repoId) {
+    const clonePath = path.join(__dirname, 'cloned-repos', repoId);
+
+    // Check if repo exists
+    if (fs.existsSync(clonePath)) {
+      const files = fs.readdirSync(clonePath);
+      repoInfo = { repoName: repoId, files };  // You can add more metadata if needed
+    }
+  }
+
+  // Construct a dummy response based on message and repo context
+  let reply = 'I didn’t get that. Can you please clarify?';
+
+  if (repoInfo.repoName) {
+    // Add basic repo details in response for now (expandable with more logic)
+    reply = `Your repo '${repoInfo.repoName}' contains files like ${repoInfo.files.join(', ')}. How can I help you with it?`;
+  }
+
+  res.json({ reply });
 });
 
 app.post('/api/index-repo', async (req, res) => {

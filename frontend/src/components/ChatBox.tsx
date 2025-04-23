@@ -1,24 +1,37 @@
 // frontend/src/components/ChatBox.tsx
-import { useState } from "react";
+import React, { useState } from 'react'
 
-export default function ChatBox() {
+interface ChatBoxProps {
+  repoId: string;
+}
 
+export default function ChatBox({ repoId }: ChatBoxProps) {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
 
   const handleSend = async () => {
     if (!input.trim()) return;
+
     const userMsg = input;
-    setMessages([...messages, "🧑: " + userMsg]);
+    setMessages(prev => [...prev, "🧑: " + userMsg]);
     setInput("");
 
-    const res = await fetch("http://localhost:3001/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userMsg }),
-    });
-    const data = await res.json();
-    setMessages((prev) => [...prev, "🤖: " + data.reply]);
+    try {
+      const res = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMsg,
+          repoId, // 🧠 Send repo context here
+        }),
+      });
+
+      const data = await res.json();
+      setMessages(prev => [...prev, "🤖: " + data.reply]);
+    } catch (error) {
+      setMessages(prev => [...prev, "🤖: Failed to connect to backend"]);
+      console.error("Chat error:", error);
+    }
   };
 
   return (
@@ -35,7 +48,10 @@ export default function ChatBox() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about your code..."
         />
-        <button className="px-4 py-2 bg-blue-600 rounded" onClick={handleSend}>
+        <button
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded"
+          onClick={handleSend}
+        >
           Send
         </button>
       </div>

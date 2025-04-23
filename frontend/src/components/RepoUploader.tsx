@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 
-const RepoUploader = () => {
+interface Props {
+  onRepoConnected: (repoId: string) => void;
+}
+
+const RepoUploader = ({ onRepoConnected }) => {
   const [repoUrl, setRepoUrl] = useState("");
 
   interface RepoInfo {
@@ -30,9 +34,10 @@ const RepoUploader = () => {
       const data = await res.json();
       if (data.success) {
         setRepoInfo(data);
-
+        
         setStatus('success');
         setMessage(`✅ Repo "${data.repoName}" connected!`);
+        onRepoConnected(data.repoName); // <- Notify parent
       } else {
         setStatus('error');
         setMessage(`❌ ${data.error}`);
