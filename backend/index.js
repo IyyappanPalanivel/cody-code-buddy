@@ -28,27 +28,27 @@ app.post('/api/chat', (req, res) => {
 });
 
 app.post('/api/index-repo', async (req, res) => {
-  const { repoUrl } = req.body;
-  if (!repoUrl) {
-    return res.status(400).json({ success: false, error: 'Repo URL required' });
-  }
-
-  const repoId = uuidv4();
-  const clonePath = path.join(__dirname, 'cloned-repos', repoId);
+  const { repoUrl, refresh } = req.body;
+  const repoName = path.basename(repoUrl, '.git');
+  const clonePath = path.join(__dirname, 'cloned-repos', repoName);
 
   try {
-    const git = simpleGit();
-    await git.clone(repoUrl, clonePath);
+    if (fs.existsSync(clonePath)) {
+      if (refresh) {
+        fs.rmSync(clonePath, { recursive: true, force: true });
+        console.log(`🔁 Refreshing repo ${repoName}`);
+      } else {
+        console.log(`📦 Repo ${repoName} already cloned, skipping clone.`);
+      }
+    }
+
+    if (!fs.existsSync(clonePath)) {
+      const git = simpleGit();
+      await git.clone(repoUrl, clonePath);
+    }
 
     const files = fs.readdirSync(clonePath);
-    const repoName = path.basename(repoUrl, '.git');
-
-    res.json({
-      success: true,
-      repoName,
-      repoId,
-      files,
-    });
+    res.json({ success: true, repoName, files });
   } catch (error) {
     console.error("Clone error:", error.message);
     res.status(500).json({ success: false, error: error.message });
