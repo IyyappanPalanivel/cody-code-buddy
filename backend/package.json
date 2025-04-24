@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.0",
+    "chromadb": "^2.2.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "simple-git": "^3.27.0",

@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 
+const { indexRepo } = require('./src/utils/indexRepo');
+
 const app = express();
 const PORT = 3001;
 
@@ -67,10 +69,13 @@ app.post('/api/index-repo', async (req, res) => {
       await git.clone(repoUrl, clonePath);
     }
 
+    // 🔗 NEW: Index the repo after it's cloned
+    await indexRepo(repoName, clonePath);
+
     const files = fs.readdirSync(clonePath);
     res.json({ success: true, repoName, files });
   } catch (error) {
-    console.error("Clone error:", error.message);
+    console.error("Clone/Index error:", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
