@@ -25,3 +25,11 @@ dist-ssr
 
 # Cloned repos
 cloned-repos
+
+# environment variables
+.env
+.env.*.local
+
+# misc
+.DS_Store
+Thumbs.db

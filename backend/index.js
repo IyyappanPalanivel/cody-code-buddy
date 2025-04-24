@@ -8,10 +8,12 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 
+require('dotenv').config(); // Load environment variables from .env file
+
 const { indexRepo } = require('./src/utils/indexRepo');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
