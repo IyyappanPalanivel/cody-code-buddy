@@ -17,8 +17,14 @@ npm start
 The backend server will run on http://localhost:3001.
 
 ### ChromaDB
+1. Setup venv
+python3 -m venv chroma-env
+source chroma-env/bin/activate
 
-1. Run the ChromaDB server using our CLI
+2. Install dependencies
+pip install chromadb
+
+3. Run the ChromaDB server using our CLI
 chroma run --path ./chroma_data 
 
 ### Frontend
