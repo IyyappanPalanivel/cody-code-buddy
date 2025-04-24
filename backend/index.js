@@ -25,30 +25,33 @@ app.get('/', (req, res) => {
   res.send('🚀 Cody Backend is Running!');
 });
 
-app.post('/api/chat', (req, res) => {
+const { ChatGroq } = require("@langchain/groq");
+const { HumanMessage, SystemMessage } = require("@langchain/core/messages");
+const model = new ChatGroq({
+  model: "llama3-8b-8192", // or mixtral/other supported model
+  apiKey: process.env.GROQ_API_KEY,
+  temperature: 0.2,
+});
+
+app.post('/api/chat', async (req, res) => {
   const { message, repoId } = req.body; // Now includes repoId
 
   // If repoId is provided, find the corresponding folder
   let repoInfo = {};
-  if (repoId) {
-    const clonePath = path.join(__dirname, 'cloned-repos', repoId);
+  try {
+    const messages = [
+      new SystemMessage("You are Cody, an AI assistant that helps developers with their code."),
+      new HumanMessage(message),
+    ];
 
-    // Check if repo exists
-    if (fs.existsSync(clonePath)) {
-      const files = fs.readdirSync(clonePath);
-      repoInfo = { repoName: repoId, files };  // You can add more metadata if needed
-    }
+    const response = await model.invoke(messages);
+
+    res.json({ reply: response.content });
+  } catch (err) {
+    console.error("LangChain error:", err.message);
+    res.status(500).json({ reply: "Something went wrong." });
   }
 
-  // Construct a dummy response based on message and repo context
-  let reply = 'I didn’t get that. Can you please clarify?';
-
-  if (repoInfo.repoName) {
-    // Add basic repo details in response for now (expandable with more logic)
-    reply = `Your repo '${repoInfo.repoName}' contains files like ${repoInfo.files.join(', ')}. How can I help you with it?`;
-  }
-
-  res.json({ reply });
 });
 
 app.post('/api/index-repo', async (req, res) => {

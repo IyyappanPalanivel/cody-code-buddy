@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@langchain/core": "^0.3.48",
+    "@langchain/groq": "^0.2.2",
     "body-parser": "^2.2.0",
     "chromadb": "^2.2.1",
     "cors": "^2.8.5",
