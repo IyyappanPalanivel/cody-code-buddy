@@ -17,3 +17,10 @@ HUGGINGFACEHUB_API_KEY=your-api-key # Replace with your actual
 npm install my-project
 # or
 yarn add my-project
+```
+
+## Requirements
+
+1. Download Ollama and install it via https://ollama.com/.
+2. Download `nomic-embed-text` model using -> `ollama pull nomic-embed-text` for Text Embedding.
+3. 
