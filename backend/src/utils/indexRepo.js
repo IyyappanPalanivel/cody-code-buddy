@@ -10,11 +10,6 @@ const { getEmbedder } = require('./embeddingProvider');
 
 const chroma = new ChromaClient({ path: "http://localhost:8000" });
 
-async function getEmbedding(text) {
-  // Simulate a fake embedding for now (replace later with GROQ)
-  return Array(1536).fill(0).map(() => Math.random());
-}
-
 async function getChunksFromFiles(repoPath) {
   console.log(`Getting chunks from files`);
   const chunks = [];
@@ -59,7 +54,7 @@ async function getChunksFromFiles(repoPath) {
 }
 
 async function indexRepo(repoId, repoPath) {
-  console.log(`Indexing repo: ${repoId} at ${repoPath}`);
+  console.log(`Indexing repo: ${repoId}`);
   const chunks = await getChunksFromFiles(repoPath);
 
   const embedder = await getEmbedder(); // TODO:- Dynamically get the selected embedder
