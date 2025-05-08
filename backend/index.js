@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 
 const { ChatGroq } = require("@langchain/groq");
 const { HumanMessage, SystemMessage } = require("@langchain/core/messages");
+const { queryRepo } = require('./src/utils/queryRepo');
 const model = new ChatGroq({
   model: "llama3-8b-8192", // or mixtral/other supported model
   apiKey: process.env.GROQ_API_KEY,
@@ -38,12 +39,27 @@ app.post('/api/chat', async (req, res) => {
 
   // If repoId is provided, find the corresponding folder
   let repoInfo = {};
+
   try {
+    // 1. Get top matching code chunks for the query
+    const searchResults = await queryRepo(repoId, message);
+    const topChunks = searchResults.slice(0, 5).map((r) => r.text).join("\n---\n");
+
+    // 2. Build contextual prompt for LLM
+    const contextPrompt = `You are Cody, an AI assistant that helps developers with their code.
+
+        Use the following context from the codebase to answer the user's question:
+
+        ${topChunks}
+
+        Question: ${message}
+        Answer:`; // <- We’ll send this whole thing as a single HumanMessage
+
     const messages = [
-      new SystemMessage("You are Cody, an AI assistant that helps developers with their code."),
-      new HumanMessage(message),
+      new HumanMessage(contextPrompt)
     ];
 
+    // 3. Invoke LLM with context-aware prompt
     const response = await model.invoke(messages);
 
     res.json({ reply: response.content });
@@ -51,7 +67,6 @@ app.post('/api/chat', async (req, res) => {
     console.error("LangChain error:", err.message);
     res.status(500).json({ reply: "Something went wrong." });
   }
-
 });
 
 app.post('/api/index-repo', async (req, res) => {
